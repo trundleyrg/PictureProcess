@@ -26,7 +26,7 @@ void DisplayHistogram1(Mat RawImg) {
             Scalar(255)); //display color
     }
     imshow("histogram", dstImg);
-    imwrite("lenaGrayHistogram.jpg", dstImg);
+    //imwrite("results/lenaGrayHistogram.jpg", dstImg);
     waitKey(0);
 }
 
@@ -35,7 +35,7 @@ void EqualizeHist(Mat RawImg) {
     Mat ResImg(RawImg.rows, RawImg.cols, RawImg.type(), RawImg.channels());
     equalizeHist(RawImg, ResImg);
     imshow("qualizeHist", ResImg);
-    //imwrite("lenaGrayEqalizeHist.jpg", ResImg);
+    //imwrite("results/lenaGrayEqalizeHist.jpg", ResImg);
     waitKey(0);
 }
 

@@ -3,7 +3,7 @@
 Mat ConvertColor2Gray(Mat color) {
     Mat gray;
     cvtColor(color, gray, COLOR_RGB2GRAY);
-    //imwrite("CvtColor2Gray.jpg", gray);
+    //imwrite("results/CvtColor2Gray.jpg", gray);
     return gray;
 }
 
@@ -18,7 +18,7 @@ Mat ConvertColor2Gray1(Mat color) {
         }
     /*imshow("gray", gray);
     waitKey(0);*/
-    //imwrite("CvtColor2Gray1.jpg", gray);
+    //imwrite("results/CvtColor2Gray1.jpg", gray);
     return gray;
 }
 
