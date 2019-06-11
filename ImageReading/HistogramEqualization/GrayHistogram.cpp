@@ -1,12 +1,7 @@
-#include <stdio.h>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-//#include "Color.cpp"
+#include "open.h"
 
-using namespace cv;
-using namespace std;
-
-void DispalyHistogram1(Mat RawImg) {
+//display gray image histogram
+void DisplayHistogram1(Mat RawImg) {
     Mat dstHist;
     int dims = 1;
     float hranges[] = { 0,255 };
@@ -16,7 +11,6 @@ void DispalyHistogram1(Mat RawImg) {
 
     calcHist(&RawImg, 1, &channels, Mat(), dstHist, dims, &size, ranges);
     int scale = 1;
-
     Mat dstImg(size*scale, size, CV_8U, Scalar(0));
     //get min and max value
     double minValue = 0, maxValue = 0;
@@ -27,24 +21,43 @@ void DispalyHistogram1(Mat RawImg) {
     for (int i = 0; i < 256; i++) {
         float binValue = dstHist.at<float>(i);
         int realValue = saturate_cast<int>(binValue*hpt / maxValue);
-        rectangle(dstImg, Point(i*scale, size - 1), Point((i + 1)*scale - 1, size - realValue), Scalar(255));
+        rectangle(dstImg, Point(i*scale, size - 1),//left top point
+            Point((i + 1)*scale - 1, size - realValue), //right bottom point
+            Scalar(255)); //display color
     }
     imshow("histogram", dstImg);
+    imwrite("lenaGrayHistogram.jpg", dstImg);
     waitKey(0);
 }
 
 void EqualizeHist(Mat RawImg) {
-    Mat ResImg;
+    //input and output images need the same size
+    Mat ResImg(RawImg.rows, RawImg.cols, RawImg.type(), RawImg.channels());
     equalizeHist(RawImg, ResImg);
     imshow("qualizeHist", ResImg);
+    //imwrite("lenaGrayEqalizeHist.jpg", ResImg);
     waitKey(0);
 }
+
 int main() {
-    Mat img = imread("lena512.bmp");
-    if (img.empty()) {
-        printf("image not exist!");
+    ////gray image process
+    //Mat img = imread("lena512.bmp",CV_LOAD_IMAGE_GRAYSCALE);
+    //if (img.empty()) {
+        //return -1;
+    //}
+    ////gray image process
+    //DisplayHistogram1(img);
+    //EqualizeHist(img);
+    //color image process
+    Mat color = imread("lena512color.tiff");
+    if (color.empty()) {
         return -1;
     }
-    //EqualizeHist(img);
-    DispalyHistogram1(img);
+    //imshow("color", color);
+    //waitKey(0);
+    //ConvertColor2Gray(color);
+    //Mat gray = ConvertColor2Gray1(color);
+    //imshow("gray", gray);
+    //waitKey(0);
+    //GetChannel(color);
 }
