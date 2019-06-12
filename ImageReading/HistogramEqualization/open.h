@@ -9,3 +9,4 @@ Mat ConvertColor2Gray(Mat color);//api come true
 Mat ConvertColor2Gray1(Mat color);//matrix process
 void GetChannel(Mat color);
 void DisplayColorHistogram(Mat RawImg);
+void EqualizeColorHist(Mat color);
