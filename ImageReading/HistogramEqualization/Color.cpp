@@ -1,13 +1,14 @@
 #include "open.h"
+#include "color.h"
 
-Mat ConvertColor2Gray(Mat color) {
+Mat ColorHist::ConvertColor2Gray(Mat color) {
     Mat gray;
     cvtColor(color, gray, COLOR_RGB2GRAY);
     //imwrite("results/CvtColor2Gray.jpg", gray);
     return gray;
 }
 
-Mat ConvertColor2Gray1(Mat color) {
+Mat ColorHist::ConvertColor2Gray1(Mat color) {
     Mat gray(color.rows, color.cols, 0, 1);
     int rowNum = color.rows;
     int colNum = color.cols;
@@ -22,7 +23,7 @@ Mat ConvertColor2Gray1(Mat color) {
     return gray;
 }
 
-void GetChannel(Mat color) {
+void ColorHist::GetChannel(Mat color) {
     vector<Mat> channels;
     Mat blue;
     Mat green;
@@ -38,7 +39,7 @@ void GetChannel(Mat color) {
     waitKey(0);
 }
 
-void DisplayColorHistogram(Mat color) {    
+void ColorHist::DisplayColorHistogram(Mat color) {    
     Mat dstHist;
     int channels = 0;
     int size[] = { 256 };
@@ -88,8 +89,7 @@ void DisplayColorHistogram(Mat color) {
     waitKey(0);
 }
 
-//get the comparison table about pixel changes
-Mat CreateComparisonTable(Mat single) {
+Mat ColorHist::CreateComparisonTable(Mat single) {
     Mat dsthist;
     int channels = 0;
     int size[] = { 256 };
@@ -110,7 +110,7 @@ Mat CreateComparisonTable(Mat single) {
     return ComparasionTable;
 }
 
-void EqualizeColorHist(Mat color) {
+void ColorHist::EqualizeColorHist(Mat color) {
     //get Max and min
     vector<Mat> channels;
     split(color, channels);
@@ -128,4 +128,20 @@ void EqualizeColorHist(Mat color) {
     waitKey(0);
     //imwrite("./results/ColorEqualHist.jpg",mergeImg);
     DisplayColorHistogram(mergeImg);
+}
+
+//将RGB格式转换为YCrCb格式，对Y通道做直方图均衡
+void ColorHist::EqualizeColorHist1(Mat color) {
+    Mat hsv, tempImg, desImg;
+    cvtColor(color, hsv, CV_BGR2YCrCb);
+    vector<Mat> channels;
+    split(hsv, channels);
+    equalizeHist(channels[0], channels[0]);
+    
+    //YUV2RGB    
+    merge(channels, tempImg);
+    cvtColor(tempImg, desImg, CV_YCrCb2BGR);
+    imshow("equalHist", desImg);
+    waitKey(0);
+    DisplayColorHistogram(desImg);
 }

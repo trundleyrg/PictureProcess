@@ -1,4 +1,5 @@
 #include "open.h"
+#include "color.h"
 
 //display gray image histogram
 void DisplayHistogram(Mat RawImg) {
@@ -48,18 +49,20 @@ int main() {
     //gray image process
     DisplayHistogram(img);
     EqualizeHist(img);
+
     //color image process
+    ColorHist demo;
     Mat color = imread("lena512color.tiff");
     if (color.empty()) {
         return -1;
     }
     imshow("color", color);
     waitKey(0);
-    ConvertColor2Gray(color);
-    Mat gray = ConvertColor2Gray1(color);
+    demo.ConvertColor2Gray(color);
+    Mat gray = demo.ConvertColor2Gray1(color);
     imshow("gray", gray);
     waitKey(0);
-    GetChannel(color);
-    DisplayColorHistogram(color);
-    EqualizeColorHist(color);
+    demo.GetChannel(color);
+    demo.DisplayColorHistogram(color);
+    demo.EqualizeColorHist1(color);
 }

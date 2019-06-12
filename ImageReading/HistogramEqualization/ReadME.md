@@ -31,12 +31,9 @@ ConvertColor2Gray1:
 GetChannel:  
 使用split函数将彩色图像切分为BGR三个单通道数组。  
 使用merge函数将三个单通道数组合并为一张彩色图像。  
-
 DisplayColorHistogram:  
 展示彩色图像直方图
-
-CreateComparisonTable：
+CreateComparisonTable：  
 根据当前像素分布，生成像素变换对照表。  
-
 EqualizeColorHist：  
 彩色图像直方图均衡  
