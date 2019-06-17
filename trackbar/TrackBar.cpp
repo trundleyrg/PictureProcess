@@ -23,7 +23,7 @@ int main() {
         "DisplayWindow",
         &g_ContrastValue,
         256,
-        ContrastAndBright);
+        ContrastAndBright, &SrcImg);
     createTrackbar("bright", "DisplayWindow",
         &g_BrightValue, 256, ContrastAndBright, &SrcImg);
 
@@ -41,16 +41,17 @@ static void ContrastAndBright(int, void *usrdata) {
     Mat SrcImg = *(Mat*)(usrdata);
     Mat DstImg = Mat::zeros(SrcImg.size(), SrcImg.type());
 
+    //cout << value << endl;
     cout << SrcImg.channels() << endl;
     for (int i = 0; i < SrcImg.rows; i++)
         for (int j = 0; j < SrcImg.cols; j++)
             for (int c = 0; c < 3; c++) {
-                cout << SrcImg.at<Vec3b>(i, j)[c];
+                //cout << SrcImg.at<Vec3b>(i, j)[c];
                 DstImg.at<Vec3b>(i, j)[c] = saturate_cast<uchar>(
                     (g_ContrastValue*0.01)*(SrcImg.at<Vec3b>(i, j)[c])
                     + g_BrightValue);
     }
 
-    imshow("InitialImg", SrcImg);
+    //imshow("InitialImg", SrcImg);
     imshow("DisplayWindow", DstImg);
 }
