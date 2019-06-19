@@ -65,10 +65,10 @@ Mat Segment::RegionGrowGray(Mat src, Point pt, int th) {
         GrowPtStack.pop_back();
 
         for (int i = 0; i < 8; i++) {
-            Point ptGrowing = Point(pt.x + neighborhood[i][0], pt.y + neighborhood[i][1]);            
+            Point ptGrowing = Point(pt.x + neighborhood[i][0], pt.y + neighborhood[i][1]);
 
             //边缘点检查
-            if (ptGrowing.x<0 || ptGrowing.y<0 || ptGrowing.x>=src.cols || ptGrowing.y>=src.rows) {
+            if (ptGrowing.x < 0 || ptGrowing.y < 0 || ptGrowing.x >= src.cols || ptGrowing.y >= src.rows) {
                 continue;
             }
 
@@ -87,3 +87,47 @@ Mat Segment::RegionGrowGray(Mat src, Point pt, int th) {
     waitKey(0);
     return maskImg.clone();
 }
+
+void Segment::ImgDilate(Mat src, Mat res, Mat kernel) {
+    // opencv 库函数调用
+    Mat res1;
+    dilate(src, res1, kernel,Point(0,0));
+    //imwrite("膨胀调库3乘3.jpg", res1);
+
+    // 原生实现
+    // 膨胀即求局部最大值
+    int rowNum = src.rows;
+    int colNum = src.cols;
+    int kernelRow = kernel.rows;
+    int kernelCol = kernel.cols;
+    int neightborhoodLen = kernelCol*kernelRow;
+    vector<int> neightborhood[2];
+    for (int i = (int)-kernelRow / 2; i <= (int)kernelRow / 2; i++)
+        for (int j = (int)-kernelCol / 2; j <= (int)kernelCol / 2; j++) {
+            neightborhood[0].push_back(i);
+            neightborhood[1].push_back(j);
+        }//初始化区域访问数组
+
+    for (int i = 0; i < rowNum; i++)
+        for (int j = 0; j < colNum; j++) {
+            uchar tempMax = src.at<uchar>(i, j);
+            // 遍历区域内容，获得局部最大值
+            for (int a = 0; a < kernelRow; a++)
+                for (int b = 0; b < kernelCol; b++) {
+                    // 访问越界判断
+                    if ((i + a) < 0 || (i + a) >= rowNum ||
+                        (j + b) < 0 || (j + b) >= colNum) {
+                        continue;
+                    }
+                    uchar tempValue = src.at<uchar>(i + a, j + b);
+                    tempMax = tempValue > tempMax ? tempValue : tempMax;
+                }
+            res.at<uchar>(i, j) = tempMax;
+        }
+    imshow("膨胀", res);
+    //imwrite("膨胀原生3乘3.jpg",res);
+    //imshow("比较", res1 - res);
+    //imwrite("膨胀对比图.jpg", res1 - res);
+    waitKey(0);
+}
+

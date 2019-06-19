@@ -15,7 +15,17 @@ int main() {
         200, Segment::adjustThreshold, &srcImg);
     Segment::adjustThreshold(thresholdValue, &srcImg);*/
 
-    Point grow(180, 20);
-    seg.RegionGrowGray(srcImg, grow, 20);
+    //// 区域生长算法
+    //Point grow(180, 20);//起始点坐标
+    //seg.RegionGrowGray(srcImg, grow, 20);
+
+    //形态学变换
+    Mat demoImg = imread("形态学变换.jpg", 0);
+    imshow("形态学变换", demoImg);
+    //waitKey(0);
+    // 图像膨胀与腐蚀
+    Mat element = getStructuringElement(MORPH_RECT, Size(3, 3));// 获取自定义核，全一填充
+    Mat out = Mat::zeros(demoImg.size(), CV_8UC1);//初始化结果图像;
+    seg.ImgDilate(demoImg, out, element);
     return 0;
 }
