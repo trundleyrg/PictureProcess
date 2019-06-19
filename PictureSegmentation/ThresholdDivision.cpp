@@ -26,6 +26,12 @@ int main() {
     // 图像膨胀与腐蚀
     Mat element = getStructuringElement(MORPH_RECT, Size(3, 3));// 获取自定义核，全一填充
     Mat out = Mat::zeros(demoImg.size(), CV_8UC1);//初始化结果图像;
-    seg.ImgDilate(demoImg, out, element);
+    //seg.ImgDilate(demoImg, out, element);
+    //seg.ImgErode(demoImg, out, element);
+    //seg.OpeningOperation(demoImg, out, element);
+    seg.CloseingOperation(demoImg, out, element);
+    imshow("1", out);
+    waitKey(0);
+    cout << out.at<uchar>(20, 20) << endl;
     return 0;
 }

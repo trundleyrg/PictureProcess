@@ -91,11 +91,11 @@ Mat Segment::RegionGrowGray(Mat src, Point pt, int th) {
 void Segment::ImgDilate(Mat src, Mat res, Mat kernel) {
     // opencv 库函数调用
     Mat res1;
-    dilate(src, res1, kernel,Point(0,0));
+    dilate(src, res1, kernel, Point(0, 0));
     //imwrite("膨胀调库3乘3.jpg", res1);
 
     // 原生实现
-    // 膨胀即求局部最大值
+    // 膨胀即求图像在kernel区域大小的块中的局部最大值
     int rowNum = src.rows;
     int colNum = src.cols;
     int kernelRow = kernel.rows;
@@ -124,10 +124,65 @@ void Segment::ImgDilate(Mat src, Mat res, Mat kernel) {
                 }
             res.at<uchar>(i, j) = tempMax;
         }
-    imshow("膨胀", res);
-    //imwrite("膨胀原生3乘3.jpg",res);
-    //imshow("比较", res1 - res);
-    //imwrite("膨胀对比图.jpg", res1 - res);
+    /*imshow("膨胀", res);
+    imwrite("膨胀原生3乘3.jpg", res);
+    imshow("比较", res1 - res);
+    imwrite("膨胀对比图.jpg", res1 - res);
+    waitKey(0);*/
+}
+
+void Segment::ImgErode(Mat src, Mat res, Mat kernel) {
+    ////opencv 库函数调用
+    //Mat res1;
+    //erode(src, res1, kernel);
+    //imshow("腐蚀内容", res1);
+    //waitKey(0);
+
+    //腐蚀即求图像在kernel区域大小的块中的局部最小值
+    int rowNum = src.rows;
+    int colNum = src.cols;
+    int kernelRow = kernel.rows;
+    int kernelCol = kernel.cols;
+    int neightborhoodLen = kernelCol*kernelRow;
+    vector<int> neightborhood[2];
+    for (int i = (int)-kernelRow / 2; i <= (int)kernelRow / 2; i++)
+        for (int j = (int)-kernelCol / 2; j <= (int)kernelCol / 2; j++) {
+            neightborhood[0].push_back(i);
+            neightborhood[1].push_back(j);
+        }//初始化区域访问数组
+
+    for (int i = 0; i < rowNum; i++)
+        for (int j = 0; j < colNum; j++) {
+            uchar tempMin = src.at<uchar>(i, j);
+            // 遍历区域内容，获得局部最大值
+            for (int a = 0; a < kernelRow; a++)
+                for (int b = 0; b < kernelCol; b++) {
+                    // 访问越界判断
+                    if ((i + a) < 0 || (i + a) >= rowNum ||
+                        (j + b) < 0 || (j + b) >= colNum) {
+                        continue;
+                    }
+                    uchar tempValue = src.at<uchar>(i + a, j + b);
+                    tempMin = tempValue > tempMin ? tempMin : tempValue;
+                }
+            res.at<uchar>(i, j) = tempMin;
+        }
+    /*imshow("腐蚀", res);
+    waitKey(0);*/
+}
+
+//开运算为先腐蚀后膨胀
+void Segment::OpeningOperation(Mat src, Mat res, Mat kernel) {
+    Segment::ImgErode(src, res, kernel);
+    Segment::ImgDilate(src, res, kernel);
+    imshow("开运算", res);
     waitKey(0);
 }
 
+//闭运算为先膨胀后腐蚀
+void Segment::CloseingOperation(Mat src, Mat res, Mat kernel) {
+    Segment::ImgDilate(src, res, kernel);
+    Segment::ImgErode(src, res, kernel);
+    imshow("闭运算", res);
+    waitKey(0);
+}

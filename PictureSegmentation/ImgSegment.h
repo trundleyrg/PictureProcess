@@ -12,9 +12,9 @@ public:
     // ÅòÕÍ
     void ImgDilate(Mat src, Mat res, Mat kernel);
     // ¸¯Ê´
-
+    void ImgErode(Mat src, Mat res, Mat kernel);
     // ¿ªÔËËã
-
+    void OpeningOperation(Mat src, Mat res, Mat kernel);
     // ±ÕÔËËã
-
+    void CloseingOperation(Mat src, Mat res, Mat kernel);
 };
