@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "trackbar", "..\trackbar\tra
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PictureSegmentation", "..\PictureSegmentation\PictureSegmentation.vcxproj", "{E04417DB-C84C-4324-A41D-CEF3C23868D8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GeometricTransformation", "..\GeometricTransformation\GeometricTransformation.vcxproj", "{8AAA1417-18FE-438A-948F-3659ACE59798}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{E04417DB-C84C-4324-A41D-CEF3C23868D8}.Release|x64.Build.0 = Release|x64
 		{E04417DB-C84C-4324-A41D-CEF3C23868D8}.Release|x86.ActiveCfg = Release|Win32
 		{E04417DB-C84C-4324-A41D-CEF3C23868D8}.Release|x86.Build.0 = Release|Win32
+		{8AAA1417-18FE-438A-948F-3659ACE59798}.Debug|x64.ActiveCfg = Debug|x64
+		{8AAA1417-18FE-438A-948F-3659ACE59798}.Debug|x64.Build.0 = Debug|x64
+		{8AAA1417-18FE-438A-948F-3659ACE59798}.Debug|x86.ActiveCfg = Debug|Win32
+		{8AAA1417-18FE-438A-948F-3659ACE59798}.Debug|x86.Build.0 = Debug|Win32
+		{8AAA1417-18FE-438A-948F-3659ACE59798}.Release|x64.ActiveCfg = Release|x64
+		{8AAA1417-18FE-438A-948F-3659ACE59798}.Release|x64.Build.0 = Release|x64
+		{8AAA1417-18FE-438A-948F-3659ACE59798}.Release|x86.ActiveCfg = Release|Win32
+		{8AAA1417-18FE-438A-948F-3659ACE59798}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

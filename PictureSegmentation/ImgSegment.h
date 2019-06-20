@@ -17,4 +17,12 @@ public:
     void OpeningOperation(Mat src, Mat res, Mat kernel);
     // 闭运算
     void CloseingOperation(Mat src, Mat res, Mat kernel);
+    // 测地膨胀
+    void GeodesicDilation(Mat src, Mat mask, Mat kernel, int iterations, Mat res);
+    // 形态学梯度
+    void MorphologicalGradient(Mat src, Mat res, Mat kernel);
+    // 分水岭算法
+    void WaterShed(Mat src, Mat& markers);
+    // 随机生成颜色函数
+    Vec3b RandomColor(int value);
 };

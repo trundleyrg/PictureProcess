@@ -1,22 +1,22 @@
-#include "ImgSegment.h"
+ï»¿#include "ImgSegment.h"
 
 void Segment::AdjustThreshold(int thresholdValue, void* usrdata) {
     Mat srcImg;
-    // ·Ö¸î²Ù×÷Ö±½ÓÔÚÔ­Í¼Ïñ¾ØÕóÉÏ½øĞĞ¡£
-    // Îª±ÜÃâÎÛÈ¾Ô´Êı¾İ£¬Ê¹ÓÃcopytoº¯Êı£¬¸´ÖÆÒ»¸öĞÂ¾ØÕó¶ÔÏó¡£Ö´ĞĞËÙ¶È½µµÍ
+    // åˆ†å‰²æ“ä½œç›´æ¥åœ¨åŸå›¾åƒçŸ©é˜µä¸Šè¿›è¡Œã€‚
+    // ä¸ºé¿å…æ±¡æŸ“æºæ•°æ®ï¼Œä½¿ç”¨copytoå‡½æ•°ï¼Œå¤åˆ¶ä¸€ä¸ªæ–°çŸ©é˜µå¯¹è±¡ã€‚æ‰§è¡Œé€Ÿåº¦é™ä½
     (*(Mat*)(usrdata)).copyTo(srcImg);
     cout << "adjust:" << thresholdValue << endl;
 
-    // ãĞÖµ·Ö¸î
+    // é˜ˆå€¼åˆ†å‰²
     threshold(srcImg, srcImg, thresholdValue, 255, THRESH_BINARY);
 
-    // ÂÖÀª²éÕÒ
+    // è½®å»“æŸ¥æ‰¾
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
     findContours(srcImg, contours, hierarchy,
         RETR_LIST, CHAIN_APPROX_SIMPLE);
 
-    // ÂÖÀªÌî³ä
+    // è½®å»“å¡«å……
     /*drawContours(srcImg, contours, -1,
         Scalar::all(255), 1, 8, hierarchy);*/
     for (int index = 0; index >= 0; index = hierarchy[index][0]) {
@@ -25,35 +25,35 @@ void Segment::AdjustThreshold(int thresholdValue, void* usrdata) {
             color, 1, 8, hierarchy);
     }
 
-    imshow("ãĞÖµ·Ö¸î", srcImg);
+    imshow("é˜ˆå€¼åˆ†å‰²", srcImg);
     waitKey(0);
 }
 
 void Segment::SegThreshold(Mat input, Mat output, int value, int upValue) {
     output = input.clone();
-    cout << output.channels() << endl;
+    //cout << output.channels() << endl;
 
     Mat_<uchar>::iterator it = output.begin<uchar>();
     Mat_<uchar>::iterator itend = output.end<uchar>();
     for (; it != itend; it++) {
         (*it) = (*it) > value ? upValue : 0;
     }
-    imshow("ãĞÖµÇĞ¸î", output);
+    imshow("é˜ˆå€¼åˆ‡å‰²", output);
     waitKey(0);
 }
 
-// ÇøÓòÉú³¤Ëã·¨
-// »Ò¶ÈÊµÏÖ£ºÒÑÖªÒ»¸ö³õÊ¼Éú³¤µã£¬Éú³ÉÒ»·ùÍ¬³ß´çÈ«ºÚÍ¼Ïñ£¬
-// ¸ù¾İ³õÊ¼Éú³¤µãÅĞ¶ÏÖÜÎ§°ËÁÚÓòÏñËØÊÇ·ñ´óÓÚÔ¤¶¨ãĞÖµ£¬Î´³¬¹ıÔò½«¸Ãµã¼ÓÈëÉú²ú³¤µãÕ»ÖĞ
-// Õ»Îª¿ÕÊ±ÍË³ö
+// åŒºåŸŸç”Ÿé•¿ç®—æ³•
+// ç°åº¦å®ç°ï¼šå·²çŸ¥ä¸€ä¸ªåˆå§‹ç”Ÿé•¿ç‚¹ï¼Œç”Ÿæˆä¸€å¹…åŒå°ºå¯¸å…¨é»‘å›¾åƒï¼Œ
+// æ ¹æ®åˆå§‹ç”Ÿé•¿ç‚¹åˆ¤æ–­å‘¨å›´å…«é‚»åŸŸåƒç´ æ˜¯å¦å¤§äºé¢„å®šé˜ˆå€¼ï¼Œæœªè¶…è¿‡åˆ™å°†è¯¥ç‚¹åŠ å…¥ç”Ÿäº§é•¿ç‚¹æ ˆä¸­
+// æ ˆä¸ºç©ºæ—¶é€€å‡º
 Mat Segment::RegionGrowGray(Mat src, Point pt, int th) {
     Mat maskImg = Mat::zeros(src.size(), CV_8UC1);//
-    vector<Point> GrowPtStack;//Éú³¤µãÕ»
+    vector<Point> GrowPtStack;//ç”Ÿé•¿ç‚¹æ ˆ
     int neighborhood[8][2] = { {-1,-1},{-1,0},{-1,1},{0,-1},
-        {0,1},{1,-1},{1,0},{1,1} };//°ËÁÚÓò
+        {0,1},{1,-1},{1,0},{1,1} };//å…«é‚»åŸŸ
     int curValue = 0;
     int maskValue = 0;
-    int srcValue = 0;//Éú³¤Æğµã»Ò¶È
+    int srcValue = 0;//ç”Ÿé•¿èµ·ç‚¹ç°åº¦
 
     GrowPtStack.push_back(pt);
     srcValue = src.at<uchar>(pt.x, pt.y);
@@ -67,13 +67,13 @@ Mat Segment::RegionGrowGray(Mat src, Point pt, int th) {
         for (int i = 0; i < 8; i++) {
             Point ptGrowing = Point(pt.x + neighborhood[i][0], pt.y + neighborhood[i][1]);
 
-            //±ßÔµµã¼ì²é
+            //è¾¹ç¼˜ç‚¹æ£€æŸ¥
             if (ptGrowing.x < 0 || ptGrowing.y < 0 || ptGrowing.x >= src.cols || ptGrowing.y >= src.rows) {
                 continue;
             }
 
             maskValue = maskImg.at<uchar>(ptGrowing.x, ptGrowing.y);
-            //ÏàËÆÔªËØÈëÕ»
+            //ç›¸ä¼¼å…ƒç´ å…¥æ ˆ
             if (maskValue == 0) {
                 curValue = src.at<uchar>(ptGrowing.x, ptGrowing.y);
                 if (abs(srcValue - curValue) < th) {
@@ -88,14 +88,15 @@ Mat Segment::RegionGrowGray(Mat src, Point pt, int th) {
     return maskImg.clone();
 }
 
+//è†¨èƒ€ï¼šè·å–åŒºåŸŸæœ€å¤§å€¼
 void Segment::ImgDilate(Mat src, Mat res, Mat kernel) {
-    // opencv ¿âº¯Êıµ÷ÓÃ
-    Mat res1;
-    dilate(src, res1, kernel, Point(0, 0));
-    //imwrite("ÅòÕÍµ÷¿â3³Ë3.jpg", res1);
+    // opencv åº“å‡½æ•°è°ƒç”¨
+    /*Mat res1;
+    dilate(src, res1, kernel, Point(0, 0));*/
+    //imwrite("è†¨èƒ€è°ƒåº“3ä¹˜3.jpg", res1);
 
-    // Ô­ÉúÊµÏÖ
-    // ÅòÕÍ¼´ÇóÍ¼ÏñÔÚkernelÇøÓò´óĞ¡µÄ¿éÖĞµÄ¾Ö²¿×î´óÖµ
+    // åŸç”Ÿå®ç°
+    // è†¨èƒ€å³æ±‚å›¾åƒåœ¨kernelåŒºåŸŸå¤§å°çš„å—ä¸­çš„å±€éƒ¨æœ€å¤§å€¼
     int rowNum = src.rows;
     int colNum = src.cols;
     int kernelRow = kernel.rows;
@@ -106,15 +107,15 @@ void Segment::ImgDilate(Mat src, Mat res, Mat kernel) {
         for (int j = (int)-kernelCol / 2; j <= (int)kernelCol / 2; j++) {
             neightborhood[0].push_back(i);
             neightborhood[1].push_back(j);
-        }//³õÊ¼»¯ÇøÓò·ÃÎÊÊı×é
+        }//åˆå§‹åŒ–åŒºåŸŸè®¿é—®æ•°ç»„
 
     for (int i = 0; i < rowNum; i++)
         for (int j = 0; j < colNum; j++) {
             uchar tempMax = src.at<uchar>(i, j);
-            // ±éÀúÇøÓòÄÚÈİ£¬»ñµÃ¾Ö²¿×î´óÖµ
+            // éå†åŒºåŸŸå†…å®¹ï¼Œè·å¾—å±€éƒ¨æœ€å¤§å€¼
             for (int a = 0; a < kernelRow; a++)
                 for (int b = 0; b < kernelCol; b++) {
-                    // ·ÃÎÊÔ½½çÅĞ¶Ï
+                    // è®¿é—®è¶Šç•Œåˆ¤æ–­
                     if ((i + a) < 0 || (i + a) >= rowNum ||
                         (j + b) < 0 || (j + b) >= colNum) {
                         continue;
@@ -124,21 +125,22 @@ void Segment::ImgDilate(Mat src, Mat res, Mat kernel) {
                 }
             res.at<uchar>(i, j) = tempMax;
         }
-    /*imshow("ÅòÕÍ", res);
-    imwrite("ÅòÕÍÔ­Éú3³Ë3.jpg", res);
-    imshow("±È½Ï", res1 - res);
-    imwrite("ÅòÕÍ¶Ô±ÈÍ¼.jpg", res1 - res);
+    /*imshow("è†¨èƒ€", res);
+    imwrite("è†¨èƒ€åŸç”Ÿ3ä¹˜3.jpg", res);
+    imshow("æ¯”è¾ƒ", res1 - res);
+    imwrite("è†¨èƒ€å¯¹æ¯”å›¾.jpg", res1 - res);
     waitKey(0);*/
 }
 
+//è…èš€ï¼šè·å–åŒºåŸŸæœ€å°å€¼
 void Segment::ImgErode(Mat src, Mat res, Mat kernel) {
-    ////opencv ¿âº¯Êıµ÷ÓÃ
+    ////opencv åº“å‡½æ•°è°ƒç”¨
     //Mat res1;
     //erode(src, res1, kernel);
-    //imshow("¸¯Ê´ÄÚÈİ", res1);
+    //imshow("è…èš€å†…å®¹", res1);
     //waitKey(0);
 
-    //¸¯Ê´¼´ÇóÍ¼ÏñÔÚkernelÇøÓò´óĞ¡µÄ¿éÖĞµÄ¾Ö²¿×îĞ¡Öµ
+    //è…èš€å³æ±‚å›¾åƒåœ¨kernelåŒºåŸŸå¤§å°çš„å—ä¸­çš„å±€éƒ¨æœ€å°å€¼
     int rowNum = src.rows;
     int colNum = src.cols;
     int kernelRow = kernel.rows;
@@ -149,15 +151,15 @@ void Segment::ImgErode(Mat src, Mat res, Mat kernel) {
         for (int j = (int)-kernelCol / 2; j <= (int)kernelCol / 2; j++) {
             neightborhood[0].push_back(i);
             neightborhood[1].push_back(j);
-        }//³õÊ¼»¯ÇøÓò·ÃÎÊÊı×é
+        }//åˆå§‹åŒ–åŒºåŸŸè®¿é—®æ•°ç»„
 
     for (int i = 0; i < rowNum; i++)
         for (int j = 0; j < colNum; j++) {
             uchar tempMin = src.at<uchar>(i, j);
-            // ±éÀúÇøÓòÄÚÈİ£¬»ñµÃ¾Ö²¿×î´óÖµ
+            // éå†åŒºåŸŸå†…å®¹ï¼Œè·å¾—å±€éƒ¨æœ€å¤§å€¼
             for (int a = 0; a < kernelRow; a++)
                 for (int b = 0; b < kernelCol; b++) {
-                    // ·ÃÎÊÔ½½çÅĞ¶Ï
+                    // è®¿é—®è¶Šç•Œåˆ¤æ–­
                     if ((i + a) < 0 || (i + a) >= rowNum ||
                         (j + b) < 0 || (j + b) >= colNum) {
                         continue;
@@ -167,22 +169,142 @@ void Segment::ImgErode(Mat src, Mat res, Mat kernel) {
                 }
             res.at<uchar>(i, j) = tempMin;
         }
-    /*imshow("¸¯Ê´", res);
+    /*imshow("è…èš€", res);
     waitKey(0);*/
 }
 
-//¿ªÔËËãÎªÏÈ¸¯Ê´ºóÅòÕÍ
+//å¼€è¿ç®—ä¸ºå…ˆè…èš€åè†¨èƒ€
 void Segment::OpeningOperation(Mat src, Mat res, Mat kernel) {
     Segment::ImgErode(src, res, kernel);
     Segment::ImgDilate(src, res, kernel);
-    imshow("¿ªÔËËã", res);
-    waitKey(0);
+    /*imshow("å¼€è¿ç®—", res);
+    waitKey(0);*/
 }
 
-//±ÕÔËËãÎªÏÈÅòÕÍºó¸¯Ê´
+//é—­è¿ç®—ä¸ºå…ˆè†¨èƒ€åè…èš€
 void Segment::CloseingOperation(Mat src, Mat res, Mat kernel) {
     Segment::ImgDilate(src, res, kernel);
     Segment::ImgErode(src, res, kernel);
-    imshow("±ÕÔËËã", res);
+    /*imshow("é—­è¿ç®—", res);
+    waitKey(0);*/
+}
+
+// æµ‹åœ°è†¨èƒ€
+// å•æ¬¡æµ‹åœ°è†¨èƒ€ï¼šåœ¨æ ‡è®°å›¾åƒä¸Šä½¿ç”¨æŒ‡å®šå¤§å°ç»“æ„å…ƒæ‰§è¡Œè†¨èƒ€ï¼Œç„¶åå’Œæ¨¡æ¿å›¾åƒå–äº¤é›†
+// src ï¼š æ ‡è®°å›¾åƒ
+// mask ï¼šæ¨¡æ¿å›¾åƒ
+// kernel ï¼š ç»“æ„å…ƒ
+void Segment::GeodesicDilation(Mat src, Mat mask, Mat kernel, int iterations, Mat res) {
+    Segment seg;
+    Mat dil(src.size(), CV_8UC1);
+    int srcCols = src.cols;
+    int srcRows = src.rows;
+    int c = 0;
+    src.copyTo(res);
+    if (iterations < 0) {
+        //è†¨èƒ€é‡å»ºï¼Œå¾ªç¯ç»“æŸçš„åˆ¤æ–­æ ‡å‡†æ˜¯ç»“æœå›¾åƒå†æ¬¡æ‰§è¡Œè†¨èƒ€ï¼Œé‡å»ºå›¾åƒä¹Ÿä¸å†å˜åŒ–
+        do {
+            //res.copyTo(dil);
+            for (int i = 0; i < srcRows; ++i)
+                for (int j = 0; j < srcCols; ++j) {
+                    res.at<uchar>(i, j) = mask.at<uchar>(i, j) > res.at<uchar>(i, j) ?
+                        res.at<uchar>(i, j) : mask.at<uchar>(i, j);
+                }
+            seg.ImgDilate(res, res, kernel);
+            cout << c++ << endl;
+            imshow("è†¨èƒ€é‡å»º", res);
+            //å›¾åƒä¸å†å˜åŒ–æ—¶é€€å‡º
+            cout << "å›¾åƒå˜åŒ–å¯¹æ¯”" << countNonZero(src - res) << endl;
+            if (countNonZero(src - res) == 0) {
+                break;
+            }
+        } while (true);
+    }
+    else {
+        while (iterations-- == 0) {
+            seg.ImgDilate(res, res, kernel);
+            for (int i = 0; i < srcRows; ++i)
+                for (int j = 0; j < srcCols; ++j) {
+                    res.at<uchar>(i, j) = mask.at<uchar>(i, j) > res.at<uchar>(i, j) ?
+                        res.at<uchar>(i, j) : mask.at<uchar>(i, j);
+                }
+        }
+    }
+}
+
+// å½¢æ€å­¦æ¢¯åº¦
+// è·å–æ–¹å¼ï¼šè†¨èƒ€å›¾åƒå‡å»è…èš€å›¾åƒ
+void Segment::MorphologicalGradient(Mat src, Mat res, Mat kernel) {
+    Mat temp(src.size(), CV_8UC1);
+    //Mat kernel = getStructuringElement(MORPH_RECT, Size(3, 3));
+    Segment seg;
+    seg.ImgDilate(src, temp, kernel);
+    seg.ImgErode(temp, res, kernel);
+    res = temp - res;
+}
+
+// åˆ†æ°´å²­ç®—æ³•:åˆ†å‰²å›¾åƒä¸­ç´§å¯†ç›¸è¿çš„ç›®æ ‡
+// src éœ€è¦ä¸ºä¸‰é€šé“å½©è‰²å›¾åƒï¼Œmarkersè¦æ±‚ä¸ºå•é€šé“32ä½å›¾åƒ
+// Marker-controlled åˆ†æ°´å²­åˆ†å‰²
+// å›¾åƒç°åº¦åŒ–ï¼Œç»˜åˆ¶ç°åº¦å›¾åƒè¾¹ç¼˜ï¼ˆcannyç®—å­ï¼Œå½¢æ€å­¦æ¢¯åº¦ï¼‰
+// åœ¨ä¾¿æºå›¾åƒä¸ŠæŸ¥æ‰¾è½®å»“ï¼ŒæŒ‰ç…§ä¸åŒç¼–å·ç»˜åˆ¶åˆ°markersä¸Šã€‚
+// åˆ†æ°´å²­è¿ç®—ï¼Œå¹¶å¡«è‰²
+void Segment::WaterShed(Mat src, Mat& markers) {
+    Mat gray;
+    markers = Scalar::all(0);
+    cvtColor(src, gray, CV_BGR2GRAY);
+    Canny(gray, gray, 80, 150);
+    //MorphologicalGradient(gray, gray, getStructuringElement(MORPH_RECT, Size(3, 3)));
+    imshow("canny", gray);
+    Mat bi(gray.size(), CV_8UC1);
+    Segment::SegThreshold(gray, gray, 120, 255);
+    imshow("äºŒå€¼", gray);
+
+    // è½®å»“æŸ¥æ‰¾
+    vector<vector<Point>> contours;
+    vector<Vec4i> hierarchy;
+    findContours(gray, contours,
+        hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point());
+    Mat imageContours = Mat::zeros(src.size(), CV_8UC1);  //è½®å»“
+    int comp_count = 0;
+    for (int index = 0; index >= 0; index = hierarchy[index][0], comp_count++) {
+        drawContours(markers, contours, index, Scalar::all((comp_count + 1) & 255), 1, 8, hierarchy);
+        drawContours(imageContours, contours, index, Scalar(255), 1, 8, hierarchy);
+    }
+    cout << "è½®å»“æ•°é‡" << contours.size() << endl;
+    imshow("è½®å»“", imageContours);
+
+    watershed(src, markers);
+    // åˆ†æ°´å²­ä¹‹åmarkå†…å®¹
+    Mat afterWatershed;
+    convertScaleAbs(markers, afterWatershed);
+    //imshow("after watershed", afterWatershed);
+
+    // å¯¹æ¯ä¸ªåŒºåŸŸè¿›è¡Œé¢œè‰²å¡«å……
+    Mat perImg = Mat::zeros(src.size(), CV_8UC3);
+    for (int i = 0; i < markers.rows; i++)
+        for (int j = 0; j < markers.cols; j++) {
+            int index = markers.at<int>(i, j);
+            if (index == -1) {
+                perImg.at<Vec3b>(i, j) = Vec3b(255, 255, 255);
+            }
+            else {
+                perImg.at<Vec3b>(i, j) = RandomColor(index);
+            }
+        }
+    imshow("weight", perImg);
+    addWeighted(src, 0.4, perImg, 0.6, 0, src);
+    imshow("result", src);
+    imwrite("cannyæ¢¯åº¦.jpg", perImg);
     waitKey(0);
+}
+
+//ç”Ÿæˆéšæœºé¢œè‰²å‡½æ•°
+Vec3b Segment::RandomColor(int value) {
+    value = value % 255;  //ç”Ÿæˆ0-255çš„éšæœºæ•°Â Â 
+    RNG rng;
+    int aa = rng.uniform(0, value);
+    int bb = rng.uniform(0, value);
+    int cc = rng.uniform(0, value);
+    return Vec3b(aa, bb, cc);
 }
