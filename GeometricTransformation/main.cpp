@@ -16,11 +16,12 @@ int main() {
     //Í¼ÏñÐý×ª
     Mat rotateImg;
     float angle = 30;
-    geo.ImgRotate(demo, rotateImg, angle);
-    waitKey(0);
+    //geo.ImgRotate(demo, rotateImg, angle);
+
 
     //Í¼ÏñÆ½ÒÆ
     Mat waveImg;
-    
+    geo.ImgWave(demo, waveImg, Size(10, 40));
+    waitKey(0);
     return 0;
 }

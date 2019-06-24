@@ -162,6 +162,16 @@ void GeometricTransformation::ImgRotate(Mat src, Mat &dst, double angle) {
 }
 
 void GeometricTransformation::ImgWave(Mat src, Mat &dst, Size wave) {
-    dst=Mat(src.size(), CV_8UC3);
-
+    dst = Mat(src.size(), CV_8UC3, Scalar::all(0));
+    for (int i = 0; i < dst.rows; i++) {
+        for (int j = 0; j < dst.cols; j++) {
+            for (int channel = 0; channel < 3; channel++) {
+                if (i - wave.width < 0 || j - wave.height < 0) {//数组越界访问
+                    continue;
+                }
+                dst.at < Vec3b >(i,j)[channel] = src.at <Vec3b>(i - wave.width, j - wave.height)[channel];
+            }
+        }
+    }
+    imshow("图像旋转", dst);
 }
