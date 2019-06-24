@@ -1,7 +1,7 @@
 #include "GeometricTransformation.h"
 
 // 尺寸变换，根据输入的尺寸，对比原图像大小，缩放或扩展图像
-void GeometricTransformation::ImgResize(Mat src, Mat &dst, Size dimension) {
+void GeometricTransformation::ImgResize(Mat src, Mat &dst, Size dimension, int method) {
     // 库函数结果
     Mat res;
     resize(src, res, dimension);
@@ -18,10 +18,14 @@ void GeometricTransformation::ImgResize(Mat src, Mat &dst, Size dimension) {
     //通过(v,w)=T.T()*(x,y)确定新矩阵元素中每个位置对应的旧图像元素位置
     float ratioX = dimension.width / (float)src.rows;
     float ratioY = dimension.height / (float)src.cols;
-    //最近值填充法，该方法形成图像效果不好，有马赛克问题
-    geo.augmentResize(src, dst, dimension, ratioX, ratioY);
-    //双线性插值法
-    geo.smallResize(src, dst, dimension, ratioX, ratioY);
+    if (method == BILINEAR_INTERPOLATION) {
+        //双线性插值法
+        geo.augmentResize(src, dst, dimension, ratioX, ratioY);
+    }
+    else if (method == NEARESTNEIGHBOR_INTERPOLATION) {
+        //最近值填充法，该方法形成图像效果不好，有马赛克问题
+        geo.smallResize(src, dst, dimension, ratioX, ratioY);
+    }
 }
 
 //最近值填充，图像缩放
@@ -40,7 +44,10 @@ void GeometricTransformation::smallResize(Mat src, Mat &dst, Size dimension, flo
     imshow("缩放", dst);
 }
 
-// 双线性插值,图像缩放
+// 双线性插值,图像缩放,计算加速版本（浮点计算转化为整型计算，指针访问替代at访问）
+// 整数部分用来提供坐标信息，小数部分提供原图像中4个邻近位置对新图像的像素的影响权重
+// 浮点计算转化为整型计算的加速方法：将代表权重的小数部分乘以2048，在计算结束之后右移回原值，即可将权重部分的计算由小数转变为整数。
+// 
 void GeometricTransformation::augmentResize(Mat src, Mat &dst, Size dimension, float ratioX, float ratioY) {
     double scaleX = (double)src.cols / dst.cols;
     double scaleY = (double)src.rows / dst.rows;
@@ -56,14 +63,15 @@ void GeometricTransformation::augmentResize(Mat src, Mat &dst, Size dimension, f
         fy -= sy;
 
         //预防越界访问
-        sy = min(sy, src.rows - 3);
+        sy = min(sy, src.rows - 2);
         sy = max(1, sy);
-
+        //小数转为整数
         short cbufy[2];
-        cbufy[0] = saturate_cast<short>((1.f - fy) * 2048);//高位
-        cbufy[1] = 2048 - cbufy[0];//小数位
+        cbufy[0] = saturate_cast<short>((1.f - fy) * 2048);//右侧原图元素距新图元素的单位距离内比值
+        cbufy[1] = 2048 - cbufy[0];//左侧原图元素距新图元素的单位距离的小数部分
 
         for (int i = 0; i < dst.cols; ++i) {
+
             float fx = (float)((i + 0.5)*scaleX - 0.5);//x小数部分
             int sx = cvFloor(fx);//x整数部分
             fx -= sx;
@@ -72,14 +80,19 @@ void GeometricTransformation::augmentResize(Mat src, Mat &dst, Size dimension, f
             if (sx < 0) {
                 fx = 0, sx = 0;
             }
-            if (sx >= src.cols - 1) {
+            if (sx >= src.cols - 1) {//考虑到双线性插值会访问x+1的内容，因此，x的值不能超过cols-2
                 fx = 0, sx = src.cols - 2;
             }
-
+            //浮点计算转为整型计算
             short cbufx[2];
             cbufx[0] = saturate_cast<short>((1.f - fx) * 2048);
             cbufx[1] = 2048 - cbufx[0];
 
+            // 双线性插值公式
+            // 未加速的计算公式
+            // dst(i,j)[c]=[src(sx,sy)[c]*fx+src(sx+1,sy)[c]*(1-fx)]*fy+[src(sx,sy+1)*fx+src(sx+1,sy+1)*(1-fx)]*(1-fy)
+            // 使用加速数组替换浮点数fx,fy
+            // dst(i,j)[c]=[src(sx,sy)[c]*cbufx[0]+src(sx+1,sy)[c]*cbufx[1]]*cbufy[0]+[src(sx,sy+1)*cbufx[0]+src(sx+1,sy+1)*cbufx[1]]*cbufy[1]
             for (int c = 0; c < src.channels(); ++c) {
                 *(DataDst + j*stepDst + 3 * i + c) = (*(DataSrc + sy*stepSrc + 3 * sx + c)*cbufx[0] * cbufy[0] +
                     *(DataSrc + (sy + 1)*stepSrc + 3 * sx + c)*cbufx[0] * cbufy[1] +
@@ -89,28 +102,66 @@ void GeometricTransformation::augmentResize(Mat src, Mat &dst, Size dimension, f
             imshow("cha", dst);
         }
     }
-    //for (int i = 0; i < dst.rows; i++)
-    //    for (int j = 0; j < dst.cols; j++)
-    //        for (int c = 0; c < dst.channels(); c++) {
-    //            int x = i / ratioX;//x整数部分，整数部分记载的是src中左上角坐标位置(opencv世界观的坐标系)
-    //            int y = j / ratioY;//y整数部分
-    //            float fx = i / ratioX - x;//x小数部分,该部分作为权重值，反映映射点周围四个像素对新图中的像素的影响比例
-    //            float fy = j / ratioY - y;//y小数部分
+}
 
-    //            float bottom[3], top[3];
-    //            if (fx == 0 && fy == 0) {//为了提高效率，试图加速。因此增加了条件判断，都为整数则直接填入
-    //                dst.at<Vec3b>(i, j)[c] = src.at<Vec3b>(x, y)[c];
-    //            }
-    //            else if (x>src.rows-1 ) {//边界检查,超过范围则直接赋值
+// 图片旋转
+// 1.将坐标原点由图像的左上角变换到旋转中心
+// 2.以旋转中心为原点，图像旋转角度angle
+// 3.旋转结束后，坐标原点变换到旋转后图像的左上角
+//
+void GeometricTransformation::ImgRotate(Mat src, Mat &dst, double angle) {
+    //角度转化为弧度
+    double radian = angle*M_PI / 180;
+    double co = fabs(cos(radian));
+    double si = fabs(sin(radian));
 
-    //            }
-    //            else {//双线性插值
-    //                if (x + 1 >= src.rows || )
-    //                    //首先在x轴上完成插值
-    //                    bottom[c] = fx*src.at<Vec3b>(x, y)[c] + (1 - fx)*src.at<Vec3b>(x + 1, y)[c];
-    //                top[c] = fx*src.at<Vec3b>(x, y + 1)[c] + (1 - fx)*src.at<Vec3b>(x + 1, y + 1)[c];
-    //                //然后在y轴上完成插值
-    //                dst.at<Vec3b>(i, j)[c] = fy*bottom[c] + (1 - fy)*top[c];
-    //            }
-    //        }
+    //新图像长宽设置，以及新图像矩阵初始化
+    int dstWidth = (int)src.cols*co + src.rows*si;
+    int dstHeight = (int)src.cols*si + src.rows*co;
+    dst = Mat(Size(dstWidth, dstHeight), CV_8UC3, Scalar::all(0));
+
+    //以图像左上角点作为旋转中心，根据角度变换矩阵完成对新图的像素填充。
+    //Point srcCenter(int(src.rows / 2), int(src.cols / 2));
+    //偏移计算
+    int xOff = dstWidth / 2;
+    int yOff = dstHeight / 2;
+    int yMin = 0;
+    int yMax = dstHeight;
+    int xMin = 0;
+    int xMax = dstWidth;
+
+    double xSrc = 0, ySrc = 0;//原图坐标
+    for (int y = yMin; y < yMax; y++) {
+        for (int x = xMin; x < xMax; x++) {
+            ySrc = si*(x - xOff) + co*(y - yOff) + int(src.rows / 2);
+            xSrc = co*(x - xOff) - si*(y - yOff) + int(src.cols / 2);
+            //cout << x << endl;
+            if (ySrc >= 0.&&ySrc < src.rows - 0.5&&xSrc >= 0 && xSrc < src.cols - 0.5) {//如果在原图范围内
+                int xSmall = floor(xSrc);
+                int xLarge = ceil(xSrc);
+                int ySmall = floor(ySrc);
+                int yLarge = ceil(ySrc);
+                for (int channel = 0; channel < 3; channel++) {//双线性cha'zhi
+                    float a1 = xSmall >= 0 && ySmall >= 0 ?
+                        src.at<Vec3b>(xSmall, ySmall)[channel] : 0;
+                    float a2 = xLarge < src.cols && ySmall >= 0 ?
+                        src.at<Vec3b>(xLarge, ySmall)[channel] : 0;
+                    float a3 = xSmall >= 0 && yLarge < src.rows ?
+                        src.at<Vec3b>(xSmall, yLarge)[channel] : 0;
+                    float a4 = xLarge < src.cols && yLarge < src.rows ?
+                        src.at<Vec3b>(xLarge, yLarge)[channel] : 0;
+                    double ux = xSrc - xSmall;
+                    double uy = ySrc - ySmall;
+                    dst.at<Vec3b>(x, y)[channel] = (1 - ux)*(1 - uy)*a1 +
+                        (1 - ux)*uy*a3 + (1 - uy)*ux*a2 + ux*uy*a4;
+                }
+            }
+        }
+    }
+    imshow("旋转", dst);
+}
+
+void GeometricTransformation::ImgWave(Mat src, Mat &dst, Size wave) {
+    dst=Mat(src.size(), CV_8UC3);
+
 }
