@@ -9,8 +9,6 @@ enum Filter
     //MEDIAN_FILTER,//中值滤波器,比较特殊，单独实现
     GAUSSIAN_FILTER//高斯滤波器
 };
-#define SHARPEN 101//锐化
-#define SMOOTH  102//平滑
 // 几何变换类
 class GeometricTransformation {
 
@@ -38,9 +36,8 @@ private:
 
     // 盒状滤波器
     // dimension：滤波器尺寸
-    // flag：判断是平滑还是锐化
-    Mat BoxFilter(Size dimension,int flag);
+    Mat BoxFilter(Size dimension);
     // 高斯滤波器
     // sigma:定义高斯滤波器标准差
-    Mat GaussianFilter(Size dimension, int flag, double sigma);
+    Mat GaussianFilter(Size dimension, double sigma);
 };
