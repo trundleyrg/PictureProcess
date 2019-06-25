@@ -26,6 +26,16 @@ int main() {
     //边缘提取
     
     //图像平滑
+    Mat smoothImg,smoothImg1,gau,gau1;
+    //均值滤波
+    /*geo.ImgSmooth(demo, smoothImg, Size(3, 3), BOX_FILTER);
+    blur(demo, smoothImg1, Size(3, 3));
+    imshow("调包均值滤波", smoothImg1);
+    imshow("差值", smoothImg1 - smoothImg);*/
+    //高斯滤波
+    //geo.ImgSmooth(demo, gau, Size(3, 3), GAUSSIAN_FILTER,5);
+    GaussianBlur(demo, gau1, Size(3, 3), 5);
+    imshow("调包高斯滤波", gau1);
     waitKey(0);
     return 0;
 }

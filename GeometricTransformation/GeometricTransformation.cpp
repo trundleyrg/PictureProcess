@@ -164,6 +164,7 @@ void GeometricTransformation::ImgRotate(Mat src, Mat &dst, double angle) {
     imshow("旋转", dst);
 }
 
+// 图像平移，直接使用反向映射+仿射矩阵即可完成计算。
 void GeometricTransformation::ImgWave(Mat src, Mat &dst, Size wave) {
     dst = Mat(src.size(), CV_8UC3, Scalar::all(0));
     for (int i = 0; i < dst.rows; i++) {
@@ -172,9 +173,99 @@ void GeometricTransformation::ImgWave(Mat src, Mat &dst, Size wave) {
                 if (i - wave.width < 0 || j - wave.height < 0) {//数组越界访问
                     continue;
                 }
-                dst.at < Vec3b >(i,j)[channel] = src.at <Vec3b>(i - wave.width, j - wave.height)[channel];
+                dst.at < Vec3b >(i, j)[channel] = src.at <Vec3b>(i - wave.width, j - wave.height)[channel];
             }
         }
     }
     imshow("图像旋转", dst);
+}
+
+// 图像平滑
+// 空间域处理方法
+void GeometricTransformation::ImgSmooth(Mat src, Mat &dst, Size dimension, Filter f, double sigma) {
+    dst = Mat(src.size(), CV_8UC3, Scalar::all(0));
+
+    //滤波器模板初始化
+    Mat filter = Mat(dimension, CV_8U, Scalar::all(0));
+    switch (f) {
+    case BOX_FILTER:
+        filter = BoxFilter(dimension, SMOOTH);
+        break;
+    case GAUSSIAN_FILTER:
+        filter = GaussianFilter(dimension, SMOOTH, sigma);
+        break;
+    }
+    //调试：滤波器值观察
+    for (int i = 0; i < filter.cols; i++) {
+        for (int j = 0; j < filter.rows; j++) {
+            cout << (int)filter.at<uchar>(i, j) << " ";
+        }
+        cout << endl;
+    }
+
+    //原图像滑动范围定义
+    int xMin = floor(dimension.width / 2);
+    int xMax = src.cols - xMin;
+    int yMin = floor(dimension.height / 2);
+    int yMax = src.rows - yMin;
+    //卷积核在原图像上滑动完成平滑处理
+    //对边缘像素按照零像素填充，这样对新图中边缘像素的值影响比较大
+    for (int c = 0; c < 3; c++) {
+        for (int j = 0; j < src.rows; ++j) {
+            for (int i = 0; i < src.cols; ++i) {
+                int meanValue = 0;
+                int sumValue = 0;
+                for (int a = -xMin; a <= xMin; ++a) {
+                    for (int b = -yMin; b <= yMin; ++b) {
+                        if (i + a<0 || i + a>=src.cols || j + b<0 || j + b>=src.rows) {//访问越界检查
+                            continue;
+                        }
+                        int curValue = filter.at<uchar>(a + xMin, b + yMin);
+                        sumValue += curValue;
+                        meanValue += curValue*src.at<Vec3b>(i + a, j + b)[c];
+                    }
+                }
+                dst.at<Vec3b>(i, j)[c] = saturate_cast<uchar>(meanValue / sumValue);
+            }
+        }
+    }
+    //边缘像素处理，直接赋予原图像中对应位置的像素值
+    imshow("图像平滑", dst);
+}
+
+// 图像锐化
+// 空间域处理方法
+void GeometricTransformation::ImgSharpen(Mat src, Mat &dst, Size dimension, Filter f /* = BOX_FILTER */, double sigma/* =1.0 */) {
+    //等待处理
+}
+
+//滤波器
+//滤波结束之后，整个图像再除以系数
+
+//盒状滤波器
+//所有系数都相等的空间均值滤波器,
+Mat GeometricTransformation::BoxFilter(Size dimension, int flag) {
+    if (flag == SMOOTH) {//平滑滤波器
+        //初始化Mat数组，注意是double类型
+        Mat f = Mat(dimension, CV_8U, Scalar::all(1));
+        return f;
+    }
+    else if (flag == SHARPEN) {//锐化滤波器
+        if (dimension.height % 2 == 0 || dimension.width % 2 == 0) {//偶数锐化滤波器，报错退出
+            cout << "锐化滤波器长宽都应该为奇数" << endl;
+            return Mat();
+        }
+        else {
+            Mat f = Mat(dimension, CV_8U, Scalar::all(1));
+            int mid = -(dimension.height*dimension.width - 1);
+            f.at<uchar>(int(dimension.width / 2), int(dimension.height / 2)) = mid;//中心点赋值
+            return f;
+        }
+    }
+}
+
+//高斯滤波器
+//根据高斯分布函数计算模板上各元素值
+Mat GeometricTransformation::GaussianFilter(Size dimension, int flag, double sigma) {
+    return Mat();
 }
