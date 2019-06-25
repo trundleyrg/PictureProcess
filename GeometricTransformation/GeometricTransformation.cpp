@@ -120,11 +120,12 @@ void GeometricTransformation::ImgRotate(Mat src, Mat &dst, double angle) {
     int dstHeight = (int)src.cols*si + src.rows*co;
     dst = Mat(Size(dstWidth, dstHeight), CV_8UC3, Scalar::all(0));
 
-    //以图像左上角点作为旋转中心，根据角度变换矩阵完成对新图的像素填充。
+    //以图像中心作为旋转中心，根据角度变换矩阵完成对新图的像素填充。
     //Point srcCenter(int(src.rows / 2), int(src.cols / 2));
-    //偏移计算
+    //旋转中心
     int xOff = dstWidth / 2;
     int yOff = dstHeight / 2;
+    //新图像素范围
     int yMin = 0;
     int yMax = dstHeight;
     int xMin = 0;
@@ -133,15 +134,17 @@ void GeometricTransformation::ImgRotate(Mat src, Mat &dst, double angle) {
     double xSrc = 0, ySrc = 0;//原图坐标
     for (int y = yMin; y < yMax; y++) {
         for (int x = xMin; x < xMax; x++) {
+            //以原图像左上角坐标为原点，获得新图中x，y坐标对应于原图中x,y的坐标点。
+            //此时获得的该坐标为double浮点值，之后可以使用双线性插值方法，将该浮点值周围四个点的像素值加权赋值给新图对应坐标。
             ySrc = si*(x - xOff) + co*(y - yOff) + int(src.rows / 2);
             xSrc = co*(x - xOff) - si*(y - yOff) + int(src.cols / 2);
-            //cout << x << endl;
+            //边界检查
             if (ySrc >= 0.&&ySrc < src.rows - 0.5&&xSrc >= 0 && xSrc < src.cols - 0.5) {//如果在原图范围内
                 int xSmall = floor(xSrc);
                 int xLarge = ceil(xSrc);
                 int ySmall = floor(ySrc);
                 int yLarge = ceil(ySrc);
-                for (int channel = 0; channel < 3; channel++) {//双线性cha'zhi
+                for (int channel = 0; channel < 3; channel++) {//双线性插值
                     float a1 = xSmall >= 0 && ySmall >= 0 ?
                         src.at<Vec3b>(xSmall, ySmall)[channel] : 0;
                     float a2 = xLarge < src.cols && ySmall >= 0 ?

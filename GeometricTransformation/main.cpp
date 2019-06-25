@@ -21,7 +21,11 @@ int main() {
 
     //ÕºœÒ∆Ω“∆
     Mat waveImg;
-    geo.ImgWave(demo, waveImg, Size(10, 40));
+    //geo.ImgWave(demo, waveImg, Size(10, 40));
+
+    //±ﬂ‘µÃ·»°
+    
+    //ÕºœÒ∆Ωª¨
     waitKey(0);
     return 0;
 }
