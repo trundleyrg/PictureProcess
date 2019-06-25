@@ -6,7 +6,6 @@
 enum Filter
 {
     BOX_FILTER,//盒状滤波器
-    //MEDIAN_FILTER,//中值滤波器,比较特殊，单独实现
     GAUSSIAN_FILTER//高斯滤波器
 };
 // 几何变换类
@@ -21,10 +20,13 @@ public:
     //平移
     void ImgWave(Mat src, Mat &dst, Size wave);
     //边缘提取
-    //图像平滑，使用盒状滤波器
+
+    //图像平滑
     void ImgSmooth(Mat src, Mat &dst, Size dimension,Filter f=BOX_FILTER,double sigma=1.0);
-    //图像锐化
-    void ImgSharpen(Mat src, Mat &dst, Size dimension, Filter f = BOX_FILTER,double sigma=1.0);
+    //中值滤波
+    void ImgMeanFilter(Mat src, Mat &dst, Size dimension);
+    //图像锐化，拉普拉斯模板
+    void ImgSharpen(Mat src, Mat &dst, Size dimension);
 private:
     //下面两种值填充法只能用于缩放函数中使用，还没有实现通用化
     // 均值填充法

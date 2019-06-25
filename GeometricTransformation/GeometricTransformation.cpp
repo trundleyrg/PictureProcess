@@ -199,12 +199,12 @@ void GeometricTransformation::ImgSmooth(Mat src, Mat &dst, Size dimension, Filte
         break;
     }
     //调试：滤波器值观察
-    for (int i = 0; i < filter.cols; i++) {
+    /*for (int i = 0; i < filter.cols; i++) {
         for (int j = 0; j < filter.rows; j++) {
             cout << (int)filter.at<uchar>(i, j) << " ";
         }
         cout << endl;
-    }
+    }*/
 
     //原图像滑动范围定义
     int xMin = floor(dimension.width / 2);
@@ -241,9 +241,39 @@ void GeometricTransformation::ImgSmooth(Mat src, Mat &dst, Size dimension, Filte
     imshow("图像平滑", dst);
 }
 
+// 中值滤波
+// 该函数执行速度慢，效率低
+void GeometricTransformation::ImgMeanFilter(Mat src, Mat &dst, Size dimension) {
+    dst = Mat(src.size(), CV_8UC3, Scalar::all(0));
+    int xMin = floor(dimension.width / 2);
+    int yMin = int(floor(dimension.height / 2));
+    for (int c = 0; c < 3; c++) {
+        for (int j = 0; j < dst.rows; ++j) {
+            for (int i = 0; i < dst.cols; ++i) {
+                vector<uchar> FilterNumber;//图像像素临时存储数组,使用vector是考虑到边界像素处不能取到一共九个像素值
+                uchar mid = 0;
+                for (int a = -xMin; a <= xMin; a++) {
+                    for (int b = -yMin; b <= yMin; b++) {
+                        if (i + a < 0 || i + a >= src.cols || j + b < 0 || j + b >= src.rows) {//访问越界检查
+                            continue;
+                        }
+                        FilterNumber.push_back(src.at<Vec3b>(i + a, j + b)[c]);
+                    }
+                }
+                //排序获得中位数
+                sort(FilterNumber.begin(), FilterNumber.end());
+                mid = FilterNumber.at(int(FilterNumber.size() / 2));
+                dst.at<Vec3b>(i, j)[c] = mid;
+            }
+        }
+    }
+    imshow("中值滤波", dst);
+}
+
 // 图像锐化
+// 拉普拉斯模板
 // 空间域处理方法
-void GeometricTransformation::ImgSharpen(Mat src, Mat &dst, Size dimension, Filter f /* = BOX_FILTER */, double sigma/* =1.0 */) {
+void GeometricTransformation::ImgSharpen(Mat src, Mat &dst, Size dimension) {
     //等待处理
 }
 
@@ -265,10 +295,10 @@ Mat GeometricTransformation::GaussianFilter(Size dimension, double sigma) {
     int ky = (dimension.height - 1) / 2;
     double factor = 1 / (2 * M_PI*sigma*sigma);
     for (int i = 0; i < dimension.width; i++) {
-        int x = pow((i - kx - 1) *(i - kx - 1),2);
+        int x = pow((i - kx - 1) *(i - kx - 1), 2);
         for (int j = 0; j < dimension.height; j++) {
-            int y = pow((j - ky - 1)*(j - ky - 1),2);
-            f.at<uchar>(i, j) = saturate_cast<uchar>(factor*exp((-x - y) / (2 * sigma*sigma))+0.5);
+            int y = pow((j - ky - 1)*(j - ky - 1), 2);
+            f.at<uchar>(i, j) = saturate_cast<uchar>(factor*exp((-x - y) / (2 * sigma*sigma)) + 0.5);
         }
     }
     return f;

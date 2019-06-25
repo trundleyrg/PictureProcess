@@ -25,7 +25,7 @@ int main() {
     //边缘提取
 
     //图像平滑
-    Mat smoothImg, smoothImg1, gau, gau1;
+    Mat smoothImg, smoothImg1, gau, gau1,meanImg,meanImg1;
     //均值滤波
     /*geo.ImgSmooth(demo, smoothImg, Size(3, 3), BOX_FILTER);
     blur(demo, smoothImg1, Size(3, 3));
@@ -36,9 +36,13 @@ int main() {
     GaussianBlur(demo, gau1, Size(3, 3), 5);
     imshow("调包高斯滤波", gau1);
     imshow("高斯差值", gau1 - gau);*/
-    //均值滤波
-    
-    //图像锐化
+    //中值滤波
+    /*geo.ImgMeanFilter(demo, meanImg, Size(3, 3));
+    medianBlur(demo, meanImg1, 3);
+    imshow("调包中值滤波", meanImg1);
+    imshow("中值差值", meanImg1 - meanImg);*/
+
+    //图像锐化，拉普拉斯模板
     waitKey(0);
     return 0;
 }
