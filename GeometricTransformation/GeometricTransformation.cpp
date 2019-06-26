@@ -94,7 +94,8 @@ void GeometricTransformation::augmentResize(Mat src, Mat &dst, Size dimension, f
             // 使用加速数组替换浮点数fx,fy
             // dst(i,j)[c]=[src(sx,sy)[c]*cbufx[0]+src(sx+1,sy)[c]*cbufx[1]]*cbufy[0]+[src(sx,sy+1)*cbufx[0]+src(sx+1,sy+1)*cbufx[1]]*cbufy[1]
             for (int c = 0; c < src.channels(); ++c) {
-                *(DataDst + j*stepDst + 3 * i + c) = (*(DataSrc + sy*stepSrc + 3 * sx + c)*cbufx[0] * cbufy[0] +
+                *(DataDst + j*stepDst + 3 * i + c) = 
+                    (*(DataSrc + sy*stepSrc + 3 * sx + c)*cbufx[0] * cbufy[0] +
                     *(DataSrc + (sy + 1)*stepSrc + 3 * sx + c)*cbufx[0] * cbufy[1] +
                     *(DataSrc + sy*stepSrc + 3 * (sx + 1) + c)*cbufx[1] * cbufy[0] +
                     *(DataSrc + (sy + 1)*stepSrc + 3 * (sx + 1) + c)*cbufx[1] * cbufy[1]) >> 22;

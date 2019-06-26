@@ -39,3 +39,45 @@ void ImgSharpen::UnsharpenedMask(Mat src, Mat &dst, float weight) {
     addWeighted(src, 1, maskImg, weight, 0.0, dst);
     imshow("高提升滤波", dst);
 }
+
+// sobel算子
+// 不同于拉普拉斯算子，sobel算子是一阶微分算子，分别在水平方向和垂直方向上做边缘检测
+// 为了加快计算速度，不使用G=sqrt(pow(Gx,2),pow(Gy,2))，而使用 G=abs(Gx)+abs(Gy)来近似代替
+void ImgSharpen::SobelSharp(Mat src, Mat &dst) {
+    Mat dstX = Mat::zeros(src.size(), src.type());
+    Mat dstY = Mat::zeros(src.size(), src.type());
+    /*uchar* p = src.data;
+    uchar* pX = dstX.data;
+    uchar* pY = dstY.data;
+    int stepS = src.step;
+    int stepX = dstX.step;
+    int stepY = dstY.step;*/
+    int ImgChannels = src.channels();
+    for (int i = 1; i < src.cols - 1; i++) {
+        for (int j = 1; j < src.rows - 1; j++) {
+            dstX.at<uchar>(i, j) = abs(saturate_cast<uchar>(src.at<uchar>(i + 1, j + 1)
+                + src.at<uchar>(i - 1, j + 1) + 2 * src.at<uchar>(i, j + 1)
+                - 2 * src.at<uchar>(i, j - 1) - src.at<uchar>(i - 1, j - 1) - src.at<uchar>(i + 1, j - 1)
+                ));
+            dstY.at<uchar>(i, j) = abs(saturate_cast<uchar>(src.at<uchar>(i + 1, j + 1)
+                + src.at<uchar>(i + 1, j - 1) + 2 * src.at<uchar>(i+1, j)
+                - 2 * src.at<uchar>(i-1, j) - src.at<uchar>(i - 1, j - 1) - src.at<uchar>(i - 1, j + 1)
+                ));
+            /**(pX + i*ImgChannels + j*stepX + c) =
+                *(p + (i - 1) * ImgChannels + (j + 1)*stepS + c) - *(p + (i - 1) * ImgChannels + (j - 1)*stepS + c) +
+                2 * (*(p + i * ImgChannels + (j + 1)*stepS + c) - *(p + i * ImgChannels + (j - 1)*stepS + c)) +
+                *(p + (i + 1) * ImgChannels + (j + 1)*stepS + c) - *(p + (i + 1) * ImgChannels + (j - 1)*stepS + c);
+            *(pY + i * 3 + j*stepX + c) =
+                *(p + (i + 1) * ImgChannels + (j - 1)*stepS + c) - *(p + (i - 1) * ImgChannels + (j - 1)*stepS + c) +
+                2 * (*(p + (i + 1) * ImgChannels + j *stepS + c) - *(p + (i - 1) * ImgChannels + j *stepS + c)) +
+                *(p + (i + 1) * ImgChannels + (j + 1)*stepS + c) - *(p + (i - 1) * ImgChannels + (j + 1)*stepS + c);*/
+        }
+    }
+    imshow("水平", dstX);
+    imshow("竖直", dstY);
+    //竖直和水平 加权和
+    addWeighted(dstX, 0.5, dstY, 0.5, 0, dst);
+    imshow("融合结果", dst);
+    //imwrite("sobel锐化.jpg", dst);
+}
+

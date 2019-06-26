@@ -53,6 +53,9 @@ public:
     //非锐化掩蔽    
     void UnsharpenedMask(Mat src, Mat &dst,float weight);
     //canny算子
+
     //sobel算子
+    void SobelSharp(Mat src, Mat &dst);
     //hough变换
+
 };

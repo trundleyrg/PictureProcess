@@ -41,13 +41,15 @@ int main() {
     imshow("中值差值", meanImg1 - meanImg);*/
 
     //图像锐化
-    Mat lapImg,highEmphasis;
+    Mat gray = imread("../PictureSegmentation/lena512.bmp", CV_LOAD_IMAGE_GRAYSCALE);
+    Mat lapImg,highEmphasis,sobelImg;
     ImgSharpen sa;
     //拉普拉斯模板
     //sa.Sharpen(demo, lapImg);
     //非锐化掩蔽
     //sa.UnsharpenedMask(demo, highEmphasis, 1);
-
+    //sobel算子
+    sa.SobelSharp(gray, sobelImg);
     waitKey(0);
     return 0;
 }
