@@ -20,8 +20,6 @@ public:
     void ImgRotate(Mat src, Mat &dst, double angle);
     //平移
     void ImgWave(Mat src, Mat &dst, Size wave);    
-    //图像锐化，拉普拉斯模板
-    void ImgSharpen(Mat src, Mat &dst, Size dimension);
 private:
     //下面两种值填充法只能用于缩放函数中使用，还没有实现通用化
 
@@ -45,4 +43,15 @@ private:
     // 高斯滤波器
     // sigma:定义高斯滤波器标准差
     Mat GaussianFilter(Size dimension, double sigma);
+};
+
+// 图像锐化，边缘检测
+class ImgSharpen {
+public:
+    //图像锐化，拉普拉斯模板
+    void Sharpen(Mat src, Mat &dst);
+    //非锐化掩蔽
+    //canny算子
+    //sobel算子
+    //hough变换
 };

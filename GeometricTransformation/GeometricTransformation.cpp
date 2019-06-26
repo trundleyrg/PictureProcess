@@ -178,10 +178,3 @@ void GeometricTransformation::ImgWave(Mat src, Mat &dst, Size wave) {
     }
     imshow("图像旋转", dst);
 }
-
-// 图像锐化
-// 拉普拉斯模板
-// 空间域处理方法
-void GeometricTransformation::ImgSharpen(Mat src, Mat &dst, Size dimension) {
-    //等待处理
-}

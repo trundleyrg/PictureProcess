@@ -2,23 +2,24 @@
 
 int main() {
     Mat demo = imread("../PictureSegmentation/lena512color.tiff", 1);
+    
+    //仿射变换
     GeometricTransformation geo;
-
     // 缩放图像
     Mat dst;
-    //Size minscale = Size(int(demo.cols * 2 / 3), int(demo.rows * 2 / 3));
-    //Size augscale = Size(int(demo.cols * 4 / 3), int(demo.rows * 4 / 3));
-    //geo.ImgResize(demo, dst, minscale);
+    Size minscale = Size(int(demo.cols * 2 / 3), int(demo.rows * 2 / 3));
+    Size augscale = Size(int(demo.cols * 4 / 3), int(demo.rows * 4 / 3));
+    /*geo.ImgResize(demo, dst, minscale);*/
     // 放大图像
-    Mat augment;
-    /*geo.ImgResize(demo, augment, augscale, NEARESTNEIGHBOR_INTERPOLATION);*/
+    /*Mat augment;
+    geo.ImgResize(demo, augment, augscale, NEARESTNEIGHBOR_INTERPOLATION);*/
     //图像旋转
-    Mat rotateImg;
+    /*Mat rotateImg;
     float angle = 30;
-    //geo.ImgRotate(demo, rotateImg, angle);
+    geo.ImgRotate(demo, rotateImg, angle);*/
     //图像平移
-    Mat waveImg;
-    //geo.ImgWave(demo, waveImg, Size(10, 40));
+    /*Mat waveImg;
+    geo.ImgWave(demo, waveImg, Size(10, 40));*/
 
     // 图像平滑
     Mat smoothImg, smoothImg1, gau, gau1,meanImg,meanImg1;
@@ -39,8 +40,15 @@ int main() {
     imshow("调包中值滤波", meanImg1);
     imshow("中值差值", meanImg1 - meanImg);*/
 
-    //图像锐化，拉普拉斯模板
-
+    //图像锐化
+    Mat lapImg;
+    ImgSharpen sa;
+    //拉普拉斯模板
+    sa.Sharpen(demo, lapImg);
+    //非锐化掩蔽
+    //1. 模糊原图像,模糊图像可以通过对原图做锐化来获得
+    //2. 从原图像中减去模糊图像
+    //3. 将模板加到原图像上
     waitKey(0);
     return 0;
 }
