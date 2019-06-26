@@ -50,7 +50,8 @@ class ImgSharpen {
 public:
     //图像锐化，拉普拉斯模板
     void Sharpen(Mat src, Mat &dst);
-    //非锐化掩蔽
+    //非锐化掩蔽    
+    void UnsharpenedMask(Mat src, Mat &dst,float weight);
     //canny算子
     //sobel算子
     //hough变换

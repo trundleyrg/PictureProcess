@@ -41,14 +41,13 @@ int main() {
     imshow("中值差值", meanImg1 - meanImg);*/
 
     //图像锐化
-    Mat lapImg;
+    Mat lapImg,highEmphasis;
     ImgSharpen sa;
     //拉普拉斯模板
-    sa.Sharpen(demo, lapImg);
+    //sa.Sharpen(demo, lapImg);
     //非锐化掩蔽
-    //1. 模糊原图像,模糊图像可以通过对原图做锐化来获得
-    //2. 从原图像中减去模糊图像
-    //3. 将模板加到原图像上
+    //sa.UnsharpenedMask(demo, highEmphasis, 1);
+
     waitKey(0);
     return 0;
 }

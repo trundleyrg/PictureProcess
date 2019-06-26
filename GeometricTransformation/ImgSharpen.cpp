@@ -26,3 +26,16 @@ void ImgSharpen::Sharpen(Mat src, Mat &dst) {
     }
     imshow("锐化结果", dst);
 }
+
+// 非锐化掩蔽/高提升滤波
+// weight>1为高提升滤波
+//1. 模糊原图像,模糊图像可以通过对原图做锐化来获得
+//2. 从原图像中减去模糊图像，获得模板图像    
+//3. 将模板加到原图像上
+void ImgSharpen::UnsharpenedMask(Mat src, Mat &dst, float weight) {
+    ImgSharpen::Sharpen(src, dst);
+    Mat maskImg;
+    maskImg = src - dst;
+    addWeighted(src, 1, maskImg, weight, 0.0, dst);
+    imshow("高提升滤波", dst);
+}
