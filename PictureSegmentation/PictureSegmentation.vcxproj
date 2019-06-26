@@ -146,7 +146,6 @@
     <ClCompile Include="ThresholdDivision.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\ImageReading\HistogramEqualization\color.h" />
     <ClInclude Include="ImgSegment.h" />
     <ClInclude Include="open.h" />
   </ItemGroup>
