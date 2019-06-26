@@ -60,8 +60,8 @@ void ImgSharpen::SobelSharp(Mat src, Mat &dst) {
                 - 2 * src.at<uchar>(i, j - 1) - src.at<uchar>(i - 1, j - 1) - src.at<uchar>(i + 1, j - 1)
                 ));
             dstY.at<uchar>(i, j) = abs(saturate_cast<uchar>(src.at<uchar>(i + 1, j + 1)
-                + src.at<uchar>(i + 1, j - 1) + 2 * src.at<uchar>(i+1, j)
-                - 2 * src.at<uchar>(i-1, j) - src.at<uchar>(i - 1, j - 1) - src.at<uchar>(i - 1, j + 1)
+                + src.at<uchar>(i + 1, j - 1) + 2 * src.at<uchar>(i + 1, j)
+                - 2 * src.at<uchar>(i - 1, j) - src.at<uchar>(i - 1, j - 1) - src.at<uchar>(i - 1, j + 1)
                 ));
             /**(pX + i*ImgChannels + j*stepX + c) =
                 *(p + (i - 1) * ImgChannels + (j + 1)*stepS + c) - *(p + (i - 1) * ImgChannels + (j - 1)*stepS + c) +
@@ -73,11 +73,36 @@ void ImgSharpen::SobelSharp(Mat src, Mat &dst) {
                 *(p + (i + 1) * ImgChannels + (j + 1)*stepS + c) - *(p + (i - 1) * ImgChannels + (j + 1)*stepS + c);*/
         }
     }
-    imshow("水平", dstX);
-    imshow("竖直", dstY);
+    //imshow("水平", dstX);
+    //imshow("竖直", dstY);
     //竖直和水平 加权和
     addWeighted(dstX, 0.5, dstY, 0.5, 0, dst);
     imshow("融合结果", dst);
     //imwrite("sobel锐化.jpg", dst);
 }
 
+//hough变换
+//
+//使用opencv的hough函数可以获得一系列的线段
+void ImgSharpen::hough(Mat src, Mat &dst) {
+    Mat cdst;
+    Canny(src, dst, 50, 200, 3);
+    cvtColor(dst, cdst, COLOR_GRAY2BGR);
+    //线段数组，4i为两端点坐标
+    vector<Vec4i> lines;
+    //渐进概率hough变换，
+    HoughLinesP(dst, 
+        lines,
+        1,//直线像素分辨率
+        CV_PI / 180,//直线弧度
+        50,//判断线条属于直线的阈值
+        50,//返回线段最小长度
+        10//共线线段之间的最小间隔
+    );
+    cout << lines.size() << endl;
+    for (size_t i = 0; i < lines.size(); i++) {
+        Vec4i l = lines[i];
+        line(dst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(186, 88, 255), 3, LINE_AA);
+    }
+    imshow("hough边缘检测", dst);
+}
